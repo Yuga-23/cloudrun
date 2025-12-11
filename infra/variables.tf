@@ -1,7 +1,7 @@
 variable "project_id" {
   description = "GCP project ID"
   type        = string
-  default = "project_id=poised-ceiling-480200-m7"
+  default = "poised-ceiling-480200-m7"
 }
 
 variable "region" {
