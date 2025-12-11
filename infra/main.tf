@@ -81,6 +81,13 @@ resource "google_service_account_iam_member" "deployer_act_as_runtime" {
   member             = "serviceAccount:${google_service_account.cloudrun_deployer.email}"
 }
 
+resource "google_project_iam_member" "cloudrun_runtime_log_writer" {
+  project = var.project_id
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:${google_service_account.cloudrun_runtime.email}"
+}
+
+
 # (Optional) If CI/CD needs to push to Artifact Registry, give writer role
 resource "google_project_iam_member" "artifactregistry_writer" {
   count   = var.enable_artifact_registry_writer ? 1 : 0
