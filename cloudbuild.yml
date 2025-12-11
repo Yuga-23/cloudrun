@@ -1,0 +1,35 @@
+steps:
+  # 1) Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:v1'
+      - '.'
+
+  # 2) Push image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:v1'
+
+  # 3) Deploy to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+          gcloud run deploy ${_SERVICE_NAME} \
+            --image us-central1-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:v1 \
+            --region ${_REGION} \
+            --platform managed \
+            --allow-unauthenticated \
+            --service-account=cloudrun-runtime@$PROJECT_ID.iam.gserviceaccount.com
+
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/${_REPO}/${_SERVICE_NAME}:v1'
+
+substitutions:
+  _SERVICE_NAME: 'cloudrun-demo'
+  _REPO: 'cloudrun-demo-repo'
+  _REGION: 'us-central1'
